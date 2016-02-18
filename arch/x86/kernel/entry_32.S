@@ -423,9 +423,24 @@ sysenter_past_esp:
 	GET_THREAD_INFO(%ebp)
 
 	testl $_TIF_WORK_SYSCALL_ENTRY,TI_flags(%ebp)
-	jnz sysenter_audit
+	jnz sysenter_audit	/* check if kernel is auditing system calls */
+	/* don't clobber registers */
+	pushl_cfi %eax
+	pushl_cfi %ecx
+	pushl_cfi %edx
+	call __should_fail
+	cmpl $0, %eax
+	/* restore registers */
+	popl_cfi %edx
+	popl_cfi %ecx
+	popl_cfi %eax
+	/* we're not failing, so do the call */
+	je sysenter_do_call
+	/* Otherwise, fail */
+	call __fail_syscall
+	jmp sysenter_after_call
 sysenter_do_call:
-	cmpl $(NR_syscalls), %eax
+	cmpl $(NR_syscalls), %eax 
 	jae sysenter_badsys
 	call *sys_call_table(,%eax,4)
 sysenter_after_call:

@@ -1297,7 +1297,7 @@ struct task_struct {
 	unsigned int ptrace;
  	
  	unsigned int syscall_cnt; /*bookkeeping for number of system calls*/
- 	unsigned int syscall_fail_num; /*bookkeeping for the nth system call following sys_fail(n) */
+ 	unsigned int sys_fail_num; /*bookkeeping for the nth system call following sys_fail(n) */
 
 
 #ifdef CONFIG_SMP

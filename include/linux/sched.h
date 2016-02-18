@@ -1295,6 +1295,10 @@ struct task_struct {
 	atomic_t usage;
 	unsigned int flags;	/* per process flags, defined below */
 	unsigned int ptrace;
+ 	
+ 	unsigned int syscall_cnt; /*bookkeeping for number of system calls*/
+ 	unsigned int syscall_fail_num; /*bookkeeping for the nth system call following sys_fail(n) */
+
 
 #ifdef CONFIG_SMP
 	struct llist_node wake_entry;

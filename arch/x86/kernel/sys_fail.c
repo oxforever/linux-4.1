@@ -16,7 +16,7 @@ asmlinkage long sys_fail(int sys_fail_num)
 		if (current->sys_fail_num != 0)
 		{
 			current->sys_fail_num = 0;
-			current->syscall_cnt = 0;	
+			current->syscall_cnt = 0;
 		}
 		else
 		{

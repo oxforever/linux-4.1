@@ -37,7 +37,7 @@ long __should_fail(void)
 	if (current->syscall_cnt == 0 && current->sys_fail_num != 0)
 	{
 		current->sys_fail_num = 0;
-		current->syscall_cnt = 0;	
+		current->syscall_cnt = 0;
 		return EPERM;
 	}
 	return 0;

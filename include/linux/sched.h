@@ -1296,8 +1296,8 @@ struct task_struct {
 	unsigned int flags;	/* per process flags, defined below */
 	unsigned int ptrace;
  	
- 	unsigned int syscall_cnt; /*bookkeeping for number of system calls*/
- 	unsigned int sys_fail_num; /*bookkeeping for the nth system call following sys_fail(n) */
+	unsigned int syscall_cnt; /*bookkeeping for number of system calls*/
+	unsigned int sys_fail_num; /*bookkeeping for the nth system call following sys_fail(n) */
 
 
 #ifdef CONFIG_SMP

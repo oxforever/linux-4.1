@@ -1604,7 +1604,6 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 	/*set syscall_cnt, sys_fail_num in the task struct for child process*/
 	p->syscall_cnt = 0;
 	p->sys_fail_num = 0;
-	 
 	return p;
 
 bad_fork_free_pid:

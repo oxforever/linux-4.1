@@ -45,5 +45,5 @@ long __should_fail(void)
 
 long __fail_syscall(void)
 {
-	return EPERM;
+	return -EPERM;
 }

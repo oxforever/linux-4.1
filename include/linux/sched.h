@@ -61,6 +61,8 @@ struct sched_param {
 
 #include <asm/processor.h>
 
+#include <linux/netlock.h>
+
 #define SCHED_ATTR_SIZE_VER0	48	/* sizeof first published struct */
 
 /*
@@ -1511,6 +1513,9 @@ struct task_struct {
 	/* Protection of the PI data structures: */
 	raw_spinlock_t pi_lock;
 
+	/*Net lock*/
+	netlock_t net_lock;
+	
 #ifdef CONFIG_RT_MUTEXES
 	/* PI waiters blocked on a rt_mutex held by this task */
 	struct rb_root pi_waiters;

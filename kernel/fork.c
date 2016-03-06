@@ -1601,6 +1601,7 @@ static struct task_struct *copy_process(unsigned long clone_flags,
 	trace_task_newtask(p, clone_flags);
 	uprobe_copy_process(p, clone_flags);
 
+	p->net_lock = net_lock;
 	return p;
 
 bad_fork_free_pid:

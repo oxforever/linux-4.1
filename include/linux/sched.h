@@ -1515,7 +1515,7 @@ struct task_struct {
 
 	/*Net lock*/
 	netlock_t net_lock;
-	
+
 #ifdef CONFIG_RT_MUTEXES
 	/* PI waiters blocked on a rt_mutex held by this task */
 	struct rb_root pi_waiters;

@@ -90,6 +90,7 @@ static DEFINE_SPINLOCK(uidhash_lock);
 /* root_user.__count is 1, for init task cred */
 struct user_struct root_user = {
 	.__count	= ATOMIC_INIT(1),
+	.mem_max	= ATOMIC_INIT(-1),
 	.processes	= ATOMIC_INIT(1),
 	.sigpending	= ATOMIC_INIT(0),
 	.locked_shm     = 0,
@@ -184,7 +185,7 @@ struct user_struct *alloc_uid(kuid_t uid)
 
 		new->uid = uid;
 		atomic_set(&new->__count, 1);
-
+		atomic_set(&new->mem_max, -1);
 		/*
 		 * Before adding this, check whether we raced
 		 * on adding the same user already..

@@ -2096,6 +2096,43 @@ get_page_from_freelist(gfp_t gfp_mask, unsigned int order, int alloc_flags,
 	int nr_fair_skipped = 0;
 	bool zonelist_rescan;
 
+    unsigned long int mem_max, mem_alloc;
+    long temp_size;
+    struct user_struct *user;
+    struct task_struct *task;
+
+    user = get_current_user();
+
+    mem_max = atomic_read(&user->mem_max);
+
+    mem_alloc = 0;
+    task = current;
+    rcu_read_lock();
+    for_each_process(task) {
+        task_lock(task);
+        if (uid_eq(task_uid(task),current_uid()))
+        {
+            if (task->mm!=NULL)
+            	mem_alloc += PAGE_SIZE*(get_mm_rss(task->mm) + atomic_long_read(&task->mm->nr_ptes));
+        }
+        task_unlock(task);
+    }
+    rcu_read_unlock();
+
+    temp_size = (long)(PAGE_SIZE*(1<<order));
+
+    if (mem_max > -1 && mem_max - mem_alloc < temp_size) {
+        /* Acquire the OOM killer lock for the zones in zonelist */
+        if (!oom_zonelist_trylock(zonelist, gfp_mask)) {
+            schedule_timeout_uninterruptible(1);
+            return NULL;
+        }
+        out_of_memory(zonelist, gfp_mask, order, ac->nodemask, false);
+        oom_zonelist_unlock(zonelist, gfp_mask);
+    }
+
+    free_uid(user);
+
 zonelist_scan:
 	zonelist_rescan = false;
 

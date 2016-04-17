@@ -149,7 +149,10 @@ static bool oom_unkillable_task(struct task_struct *p,
 unsigned long oom_badness(struct task_struct *p, struct mem_cgroup *memcg,
 			  const nodemask_t *nodemask, unsigned long totalpages)
 {
-	long points;
+	unsigned long points;
+    unsigned long swap_space;
+    struct user_struct *u_struct;
+    int mem_max;
 	long adj;
 
 	if (oom_unkillable_task(p, memcg, nodemask))
@@ -169,8 +172,9 @@ unsigned long oom_badness(struct task_struct *p, struct mem_cgroup *memcg,
 	 * The baseline for the badness score is the proportion of RAM that each
 	 * task's rss, pagetable and swap space use.
 	 */
-	points = get_mm_rss(p->mm) + get_mm_counter(p->mm, MM_SWAPENTS) +
-		atomic_long_read(&p->mm->nr_ptes) + mm_nr_pmds(p->mm);
+	points = get_mm_rss(p->mm) + atomic_long_read(&p->mm->nr_ptes) + mm_nr_pmds(p->mm);
+	swap_space = get_mm_counter(p->mm, MM_SWAPENTS);
+
 	task_unlock(p);
 
 	/*
@@ -183,7 +187,8 @@ unsigned long oom_badness(struct task_struct *p, struct mem_cgroup *memcg,
 	/* Normalize to oom_score_adj units */
 	adj *= totalpages / 1000;
 	points += adj;
-
+    u_struct = task_cred_xxx(p, user);
+    mem_max = atomic_read(&u_struct->mem_max);
 	/*
 	 * Never return 0 for an eligible task regardless of the root bonus and
 	 * oom_score_adj (oom_score_adj can't be OOM_SCORE_ADJ_MIN here).
@@ -301,6 +306,7 @@ static struct task_struct *select_bad_process(unsigned int *ppoints,
 
 	rcu_read_lock();
 	for_each_process_thread(g, p) {
+		if (uid_eq(current_uid(),task_uid(p))){
 		unsigned int points;
 
 		switch (oom_scan_process_thread(p, totalpages, nodemask,
@@ -326,6 +332,7 @@ static struct task_struct *select_bad_process(unsigned int *ppoints,
 
 		chosen = p;
 		chosen_points = points;
+		}
 	}
 	if (chosen)
 		get_task_struct(chosen);
